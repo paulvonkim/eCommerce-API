@@ -19,5 +19,6 @@ const validateProduct = (product) => {
   };
   
   // Export the validation function for use in your routes
+  
 export default validateProduct;
   
