@@ -20,4 +20,4 @@ app.use("/orders", orderRouter);
 
 
 sequelize.sync();
-app.listen(PORT, () => console.log(`Server is running on port ${port}`));
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
