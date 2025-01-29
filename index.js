@@ -14,10 +14,9 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.get("/", (req, res) => res.send("Hello, World!"));
 app.use("/users", userRouter);
-app.use("/products", productRouter);
+app.use("/api/v1/products", productRouter);
 app.use("/categories", categoryRouter);
 app.use("/orders", orderRouter);
-
 
 sequelize.sync();
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
