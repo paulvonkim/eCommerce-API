@@ -15,7 +15,7 @@ app.use(express.json());
 app.get("/", (req, res) => res.send("Hello, World!"));
 app.use("/users", userRouter);
 // app.use("/products", productRouter);
-app.use("/categories", categoryRouter);
+app.use("/api/categories", categoryRouter);
 app.use("/orders", orderRouter);
 
 sequelize.sync();
