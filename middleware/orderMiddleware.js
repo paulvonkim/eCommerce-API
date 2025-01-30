@@ -1,9 +1,4 @@
-import Joi from "joi";
-
-export const orderSchema = Joi.object({
-  total: Joi.number().required(),
-  userId: Joi.number().integer().required()
-});
+import { orderSchema } from "../schemas/orderSchemas.js";
 
 export const orderValidate = (req, res, next) => {
   const { error } = orderSchema.validate(req.body, { abortEarly: false });

@@ -13,7 +13,7 @@ export const getUsers = async (req, res) => {
 export const createUser = async (req, res) => {
   try {
     const {
-      body: { name, email, password },
+      body: { email },
     } = req;
     const found = await User.findOne({ where: { email } });
     if (found) return res.status(400).json({ error: "User already exists" });
@@ -49,7 +49,7 @@ export const updateUser = async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
-      Orders: user.Orders, // Keep the related Orders
+      Orders: user.Orders,
     };
     res.json(filteredUser);
   } catch (error) {

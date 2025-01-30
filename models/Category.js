@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import { categoriesDB } from "../db/index.js";
+import sequelize from "../db/index.js";
 
-const Category = categoriesDB.define(
+const Category = sequelize.define(
   "Category",
   {
     name: {
