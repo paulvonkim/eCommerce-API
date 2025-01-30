@@ -4,6 +4,7 @@ import userRouter from "./routers/userRouter.js";
 import productRouter from "./routers/productRouter.js";
 import categoryRouter from "./routers/categoryRouter.js";
 import orderRouter from "./routers/orderRouter.js";
+import uploadRouter from "./routers/uploadRouter.js";
 import sequelize from "./db/index.js";
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use("/users", userRouter);
 app.use("/products", productRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/orders", orderRouter);
+app.use("/upload", uploadRouter);
 
 sequelize.sync();
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
