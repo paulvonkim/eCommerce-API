@@ -13,14 +13,6 @@ export const getOrders = async (req, res) => {
 
 export const createOrder = async (req, res) => {
   try {
-    const {
-      body: { total },
-    } = req;
-    if (!total)
-      return res
-        .status(400)
-        .json({ error: "no products to count" });
-    
     const order = await Order.create(req.body);
     res.json(order);
   } catch (error) {
