@@ -6,13 +6,14 @@ import {
   updateOrder,
   deleteOrder,
 } from "../controllers/orders.js";
+import { orderValidate } from "../middleware/orderMiddleware.js";
 
 const orderRouter = Router();
 
 orderRouter.get("/", getOrders);
-orderRouter.post("/", createOrder);
+orderRouter.post("/", orderValidate, createOrder);
 orderRouter.get("/:id", getOrderById);
-orderRouter.put("/:id", updateOrder);
+orderRouter.put("/:id", orderValidate, updateOrder);
 orderRouter.delete("/:id", deleteOrder);
 
 export default orderRouter;

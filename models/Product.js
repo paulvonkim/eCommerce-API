@@ -2,11 +2,6 @@ import { DataTypes } from "sequelize";
 import sequelize from "../db/index.js";
 
 const Product = sequelize.define("Product", {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -17,10 +12,6 @@ const Product = sequelize.define("Product", {
   },
   price: {
     type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  categoryId: {
-    type: DataTypes.INTEGER,
     allowNull: false,
   },
 });
