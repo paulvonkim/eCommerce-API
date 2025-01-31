@@ -8,15 +8,3 @@ const sequelize = new Sequelize(process.env.NEON, {
 });
 
 export default sequelize;
-
-// Categories DB
-// export const categoriesDB = new Sequelize(process.env.NEON_CATEGORIES, {
-//   dialect: "postgres",
-//   logging: false,
-//   dialectOptions: {
-//     ssl: {
-//       require: true,
-//       rejectUnauthorized: false,
-//     },
-//   },
-// });

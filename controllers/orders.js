@@ -1,26 +1,25 @@
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import ErrorResponse from "../utils/ErrorResponse.js";
 
-export const getOrders = async (req, res) => {
+export const getOrders = async (req, res, next) => {
   try {
     const orders = await Order.findAll({ include: [Product, User] });
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const createOrder = async (req, res) => {
+export const createOrder = async (req, res, next) => {
   try {
     const { userId, products } = req.body;
     const productIds = products.map(product => product.productId);
-    const fetchedProducts = await Product.findAll({
-      where: { id: productIds },
-    });
+    const fetchedProducts = await Product.findAll({ where: { id: productIds } });
 
     if (!fetchedProducts.length) {
-      return res.status(400).json({ error: "No valid products found." });
+      return next(new ErrorResponse("No valid products found.", 400));
     }
 
     const productMap = new Map(products.map(product => [product.productId, product.quantity]));
@@ -35,64 +34,45 @@ export const createOrder = async (req, res) => {
       await order.addProduct(product.productId, { through: { quantity: product.quantity } });
     }));
 
-    const responseOrder = {
-      id: order.id,
-      userId: order.userId,
-      products: products.map(product => ({
-        productId: product.productId,
-        quantity: product.quantity
-      })),
-      total
-    };
-
-    res.json(responseOrder);
+    res.json({ id: order.id, userId: order.userId, products: products.map(product => ({
+      productId: product.productId,
+      quantity: product.quantity
+    })), total });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const getOrderById = async (req, res) => {
+
+export const getOrderById = async (req, res, next) => {
   try {
-    const {
-      params: { id },
-    } = req;
-    const order = await Order.findByPk(id, { include: [Product, User] });
-    if (!order) return res.status(404).json({ error: "Order not found" });
+    const order = await Order.findByPk(req.params.id, { include: [Product, User] });
+    if (!order) return next(new ErrorResponse("Order not found", 404));
     res.json(order);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const updateOrder = async (req, res) => {
+export const updateOrder = async (req, res, next) => {
   try {
-    const {
-      body: { total },
-      params: { id },
-    } = req;
-    if (!total)
-      return res
-        .status(400)
-        .json({ error: "no total amount provided" });
-    const order = await Order.findByPk(id);
-    if (!order) return res.status(404).json({ error: "Order not found" });
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return next(new ErrorResponse("Order not found", 404));
     await order.update(req.body);
     res.json(order);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const deleteOrder = async (req, res) => {
+export const deleteOrder = async (req, res, next) => {
   try {
-    const {
-      params: { id },
-    } = req;
-    const order = await Order.findByPk(id);
-    if (!order) return res.status(404).json({ error: "Order not found" });
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return next(new ErrorResponse("Order not found", 404));
     await order.destroy();
     res.json({ message: "Order deleted" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
+

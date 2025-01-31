@@ -1,54 +1,68 @@
 import Product from "../models/Product.js";
+import ErrorResponse from "../utils/ErrorResponse.js";
 
-export const getProducts = async (req, res) => {
+export const getProducts = async (req, res, next) => {
   try {
     const products = await Product.findAll();
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const getProductById = async (req, res) => {
+export const getProductById = async (req, res, next) => {
   try {
     const product = await Product.findByPk(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product) return next(new ErrorResponse("Product not found", 404));
     res.json(product);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving product", error });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const createProduct = async (req, res) => {
-  try {
-    const newProduct = await Product.create(req.body);
-    res.status(201).json(newProduct);
-  } catch (error) {
-    res.status(400).json({ message: "Error creating product", error });
-  }
-};
-
-export const updateProduct = async (req, res) => {
+export const createProduct = async (req, res, next) => {
   try {
     const { name, description, price, categoryId } = req.body;
-    const product = await Product.findByPk(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    const image = req.file ? req.file.filename : null;
 
-    await product.update({ name, description, price, categoryId });
-    res.json(product);
+    const newProduct = await Product.create({
+      name,
+      description,
+      price,
+      categoryId,
+      image,
+    });
+
+    res.status(201).json(newProduct);
   } catch (error) {
-    res.status(400).json({ message: "Error updating product", error });
+    next(new ErrorResponse(error.message, 400));
   }
 };
 
-export const deleteProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
   try {
     const product = await Product.findByPk(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product) return next(new ErrorResponse("Product not found", 404));
+
+    const { name, description, price, categoryId } = req.body;
+    const image = req.file ? req.file.filename : product.image;
+
+    await product.update({ name, description, price, categoryId, image });
+
+    res.json(product);
+  } catch (error) {
+    next(new ErrorResponse(error.message, 400));
+  }
+};
+
+export const deleteProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    if (!product) return next(new ErrorResponse("Product not found", 404));
 
     await product.destroy();
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting product", error });
+    next(new ErrorResponse(error.message, 500));
   }
 };
