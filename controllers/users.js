@@ -1,72 +1,70 @@
 import User from "../models/User.js";
 import Order from "../models/Order.js";
+import ErrorResponse from '../utils/ErrorResponse.js';
 
-export const getUsers = async (req, res) => {
+export const getUsers = async (req, res, next) => {
   try {
     const users = await User.findAll({ include: Order });
     res.json(users);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const createUser = async (req, res) => {
+export const createUser = async (req, res, next) => {
   try {
-    const {
-      body: { email },
-    } = req;
+    const { email } = req.body;
+
     const found = await User.findOne({ where: { email } });
-    if (found) return res.status(400).json({ error: "User already exists" });
+    if (found) return next(new ErrorResponse("User already exists", 400));
+
     const user = await User.create(req.body);
-    res.json(user);
+    res.status(201).json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const getUserById = async (req, res) => {
+export const getUserById = async (req, res, next) => {
   try {
-    const {
-      params: { id },
-    } = req;
-    const user = await User.findByPk(id, { include: Order });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const user = await User.findByPk(req.params.id, { include: Order });
+
+    if (!user) return next(new ErrorResponse("User not found", 404));
+
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
   try {
-    const {
-      params: { id },
-    } = req;
-    const user = await User.findByPk(id, { include: Order });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const user = await User.findByPk(req.params.id, { include: Order });
+
+    if (!user) return next(new ErrorResponse("User not found", 404));
+
     await user.update(req.body);
-    const filteredUser = {
+
+    res.json({
       id: user.id,
       name: user.name,
       email: user.email,
       Orders: user.Orders,
-    };
-    res.json(filteredUser);
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
-    const {
-      params: { id },
-    } = req;
-    const user = await User.findByPk(id);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const user = await User.findByPk(req.params.id);
+
+    if (!user) return next(new ErrorResponse("User not found", 404));
+
     await user.destroy();
     res.json({ message: "User deleted" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(new ErrorResponse(error.message, 500));
   }
 };
