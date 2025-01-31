@@ -13,7 +13,7 @@ const Product = sequelize.define("Product", {
   price: {
     type: DataTypes.FLOAT,
     allowNull: false,
-  },
+  }
 });
 
 export default Product;

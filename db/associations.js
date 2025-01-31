@@ -2,6 +2,7 @@ import sequelize from './index.js';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
 
 User.hasMany(Order, {
   foreignKey: {
@@ -17,6 +18,20 @@ Order.belongsTo(User, {
   onDelete: "CASCADE",
 });
 
+Category.hasMany(Product, {
+  foreignKey: {
+    allowNull: false,
+    name: "categoryId",
+  },
+});
+
+Product.belongsTo(Category, {
+  foreignKey: {
+    allowNull: false,
+    name: "categoryId" },
+  onDelete: "CASCADE",
+});
+
 Product.belongsToMany(Order, {
   through: 'OrderProducts',
   foreignKey: {
@@ -29,9 +44,13 @@ Product.belongsToMany(Order, {
   }
 });
 
+Order.belongsToMany(Product, { 
+  through: "OrderProducts"
+});
+
 (async () => {
   try {
-    await sequelize.sync({ force: false });
+    await sequelize.sync();
     console.log("Database synced.");
   } catch (error) {
     console.error("Error syncing database:", error);

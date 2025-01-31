@@ -1,18 +1,14 @@
 import Product from "../models/Product.js";
 
-// Get all products (optional filtering by categoryId)
 export const getProducts = async (req, res) => {
   try {
-    const { categoryId } = req.query;
-    const whereClause = categoryId ? { where: { categoryId } } : {};
-    const products = await Product.findAll(whereClause);
+    const products = await Product.findAll();
     res.json(products);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving products", error });
+    res.status(500).json({ error: error.message });
   }
 };
 
-// Get a product by ID
 export const getProductById = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
@@ -23,18 +19,15 @@ export const getProductById = async (req, res) => {
   }
 };
 
-// Create a new product
 export const createProduct = async (req, res) => {
   try {
-    const { name, description, price, categoryId } = req.body;
-    const newProduct = await Product.create({ name, description, price, categoryId });
+    const newProduct = await Product.create(req.body);
     res.status(201).json(newProduct);
   } catch (error) {
     res.status(400).json({ message: "Error creating product", error });
   }
 };
 
-// Update a product by ID
 export const updateProduct = async (req, res) => {
   try {
     const { name, description, price, categoryId } = req.body;
@@ -48,7 +41,6 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// Delete a product by ID
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
